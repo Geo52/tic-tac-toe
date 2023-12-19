@@ -34,7 +34,7 @@ function handleClick(e) {
 
   circleTurn = !circleTurn;
 
-  // populates board
+  // populates board and updates state array
   if (circleTurn === false) {
     clickedBox.textContent = player1;
     clickedBoxes[clickedBoxIndex] = player1;
@@ -43,13 +43,30 @@ function handleClick(e) {
     clickedBoxes[clickedBoxIndex] = player2;
   }
 
+  // check for winner
   if (checkWin(player1)) {
-    console.log("X wins");
     winMessage.textContent = "X wins!";
   } else if (checkWin(player2)) {
-    console.log("O wins");
     winMessage.textContent = "O wins!";
   }
+
+
+  // check for draw
+  if (full(clickedBoxes)) {
+    winMessage.textContent = 'Draw!'
+  }
+}
+
+function full(array)
+{
+  for(let i = 0 ; i < array.length; i++)
+  {
+    if(array[i] === null)
+    {
+      return false
+    }
+  }
+  return true
 }
 
 // check if a user has won
