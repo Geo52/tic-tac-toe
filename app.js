@@ -1,4 +1,4 @@
-const WINNING_COMBINATIONS = [
+const winningCombinations = [
   [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
@@ -9,85 +9,81 @@ const WINNING_COMBINATIONS = [
   [2, 4, 6],
 ];
 
-// stores all the boxes from the html
-const boxes = Array.from(document.querySelectorAll("[data-cell]"));
-const winMessage = document.querySelector("[win-msg]");
-// circle is always going to go second
-let circleTurn = true;
+const winMsg = document.querySelector("[win-msg]");
 
 const player1 = "x";
 const player2 = "o";
 
-// array to track the state of each box
-let clickedBoxes = new Array(9).fill(null);
+let boardState = Array(9).fill(null);
 
-// adds event listener to each box
-for (let i = 0; i < boxes.length; i++) {
-  boxes[i].addEventListener("click", handleClick, { once: true });
+let circlesTurn = true;
+const board = Array.from(document.querySelectorAll("[data-cell]"));
+
+// add event listener to each div
+for (let i = 0; i < board.length; i++) {
+  const element = board[i];
+  element.addEventListener("click", handleClick, { once: true });
 }
 
-// fires everytime a box is clicked
 function handleClick(e) {
   const clickedBox = e.target;
-  // gets the index of the box that was clicked from the boxes array
-  const clickedBoxIndex = boxes.indexOf(clickedBox);
+  const clickedBoxIndex = board.indexOf(clickedBox);
 
-  circleTurn = !circleTurn;
+  // x goes first
+  circlesTurn = !circlesTurn;
 
-  // populates board and updates state array
-  if (circleTurn === false) {
-    clickedBox.textContent = player1;
-    clickedBoxes[clickedBoxIndex] = player1;
-  } else {
+  // alternate x and 0
+  // updates the state of the game
+  if (circlesTurn) {
     clickedBox.textContent = player2;
-    clickedBoxes[clickedBoxIndex] = player2;
+    boardState[clickedBoxIndex] = player2;
+  } else {
+    clickedBox.textContent = player1;
+    boardState[clickedBoxIndex] = player1;
   }
 
-  // check for winner
+  // check win for x
   if (checkWin(player1)) {
-    winMessage.textContent = "X wins!";
+    winMsg.textContent = "X won";
+    // check win for o
   } else if (checkWin(player2)) {
-    winMessage.textContent = "O wins!";
+    winMsg.textContent = "O won";
   }
 
-
-  // check for draw
-  if (full(clickedBoxes)) {
-    winMessage.textContent = 'Draw!'
+  // check draw
+  if (full(boardState)) {
+    winMsg.textContent = "DRAW";
   }
 }
 
-function full(array)
-{
-  for(let i = 0 ; i < array.length; i++)
-  {
-    if(array[i] === null)
-    {
-      return false
-    }
-  }
-  return true
-}
-
-// check if a user has won
-// checking each winning combo against current state of clickedBox array
+// compare winning combos against board state
 function checkWin(player) {
-  for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
-    const combination = WINNING_COMBINATIONS[i];
+  for (let i = 0; i < winningCombinations.length; i++) {
+    const currentCombo = winningCombinations[i];
     let isWin = true;
 
-    for (let j = 0; j < combination.length; j++) {
-      const index = combination[j];
-      if (clickedBoxes[index] !== player) {
+    // check if there is a player at each index listed inside currentCombo
+    for (let i = 0; i < currentCombo.length; i++) {
+      const checkIndex = currentCombo[i];
+
+      if (boardState[checkIndex] !== player) {
         isWin = false;
         break;
       }
     }
-
     if (isWin) {
       return true;
     }
   }
-
   return false;
+}
+
+function full(array) {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === null) {
+      return false;
+    }
+  }
+
+  return true;
 }
